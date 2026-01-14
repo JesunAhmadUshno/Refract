@@ -220,3 +220,68 @@ button {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* ===========================
+   Buy Me a Coffee Bubble
+=========================== */
+.coffee-bubble {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    /* Glassmorphism style matching the site */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFDD00; /* Nice coffee yellow/gold color */
+    font-size: 24px;
+    text-decoration: none;
+    z-index: 1000; /* Ensure it stays on top */
+    /* Subtle shadow and inner yellow glow */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(255, 221, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Bouncy transition */
+    animation: floatBubble 4s ease-in-out infinite; /* Gentle floating animation */
+}
+
+/* Hover effect */
+.coffee-bubble:hover {
+    transform: scale(1.15) rotate(10deg); /* Grow and tilt */
+    background: rgba(255, 221, 0, 0.2); /* Brighter yellow glass */
+    color: #fff;
+    border-color: rgba(255, 221, 0, 0.5);
+    box-shadow: 0 15px 40px rgba(255, 221, 0, 0.3), inset 0 0 20px rgba(255, 221, 0, 0.3); /* Strong yellow glow */
+}
+
+/* Optional red notification dot */
+.coffee-dot {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 8px;
+    height: 8px;
+    background: #ff4757;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ff4757;
+}
+
+.coffee-bubble:hover .coffee-dot {
+    animation: pulseDot 1s infinite;
+}
+
+/* Animations */
+@keyframes floatBubble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+@keyframes pulseDot {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+}
