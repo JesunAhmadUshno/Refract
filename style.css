@@ -1,0 +1,222 @@
+:root {
+    --bg-dark: #09090b;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text-main: #ffffff;
+    --text-muted: #a1a1aa;
+    --accent: #6366f1; /* Indigo */
+    --accent-glow: #818cf8;
+    --font-main: 'Inter', sans-serif;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-main);
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+/* Background Ambiance */
+.gradient-bg {
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, rgba(9, 9, 11, 0) 50%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 1000px;
+    padding: 60px 20px;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 3rem;
+    letter-spacing: -2px;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo .dot {
+    color: var(--accent);
+    -webkit-text-fill-color: var(--accent);
+}
+
+.tagline {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-top: 10px;
+    font-weight: 300;
+}
+
+/* Glass Panel / Upload Zone */
+.glass-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 80px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-panel:hover {
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.icon-container {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    transition: color 0.3s;
+}
+
+.glass-panel:hover .icon-container {
+    color: var(--accent);
+}
+
+.glass-panel h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.glass-panel .sub-text {
+    color: var(--text-muted);
+    margin-bottom: 30px;
+}
+
+/* Buttons */
+button {
+    font-family: var(--font-main);
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 500;
+}
+
+.btn-secondary:hover {
+    background: white;
+    color: black;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:hover {
+    background: var(--accent-glow);
+    transform: translateY(-1px);
+}
+
+/* Results Area */
+.hidden { display: none; }
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 10px;
+    animation: fadeIn 0.5s ease;
+}
+
+.status {
+    color: #4ade80; /* Success Green */
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    animation: slideUp 0.6s ease;
+}
+
+.card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 15px;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+.preview-box {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.card-meta h4 {
+    margin: 0 0 5px 0;
+    font-size: 0.95rem;
+}
+
+.card-meta p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
