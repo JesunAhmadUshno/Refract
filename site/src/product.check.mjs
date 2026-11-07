@@ -75,6 +75,7 @@ pendingBlobs.shift()();
 await flush();
 assert.equal(ids['download-all'].disabled, false, 'ZIP enabled once all PNGs exist');
 assert.equal(ids['status-text'].textContent, 'Processing Complete');
+assert.equal(ids['drop-zone'].classes.has('hidden'), false, 'drop zone shown again so a second image can be loaded');
 assert.deepEqual(zipFiles, specs.map((s) => s.fileName), 'ZIP holds every asset, in spec order');
 assert.deepEqual(grid.children.map((c) => c.attrs['aria-label']), specs.map((s) => `Download ${s.fileName}`), 'cards in spec order');
 assert.ok(grid.children.every((c) => c.tag === 'button'), 'cards are real buttons');

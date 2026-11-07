@@ -117,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         downloadAllBtn.disabled = false;
         statusText.textContent = 'Processing Complete';
+        dropZone.classList.remove('hidden'); // hidden only while processing, so another image can be loaded
     }
 
     function createCard(imgUrl, title, dim, fileName) {
