@@ -52,6 +52,10 @@ You can try the live version of Refract here:
 
 ### [🔗 Launch Refract](https://jesunahmadushno.github.io/Refract/)
 
+Live dashboard: [jesunahmadushno.github.io/Refract/dashboard/](https://jesunahmadushno.github.io/Refract/dashboard/) runs the same resize pipeline in your browser and measures how much the stretch distorts each asset. Source in `site/`; engineering review in [docs/research-review.md](docs/research-review.md).
+
+To run the checks and build the dashboard locally: `cd site && npm ci && npm test && npm run build`.
+
 ## 🛠 How It Works
 
 Refract was originally conceptualized as a Python automation script using the `Pillow` library. It has been re-engineered as a serverless Single Page Application (SPA) to provide a better user experience.
