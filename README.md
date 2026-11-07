@@ -33,11 +33,11 @@ Built with a focus on **privacy** and **speed**, Refract operates entirely clien
 * **Privacy First:** No data transmission. All processing happens locally on your machine.
 * **Glassmorphism UI:** A sleek, modern "dark mode" interface featuring frosted glass aesthetics.
 * **One-Click ZIP:** Download all assets in a perfectly named `.zip` file, ready for upload.
-* **Smart Resizing:** Automatically scales your source image to strict Web Store dimensions.
+* **Exact-Size Resizing:** Stretches your source image to each exact target size. A source whose aspect ratio differs from a target is distorted (squashed or widened), so start from artwork close to each target's shape.
 
 ## 📦 Generated Assets
 
-Refract automatically generates the following 24-bit PNG files (no alpha), adhering to Chrome Web Store requirements:
+Refract generates the following PNG files. Each canvas is filled with white before the image is drawn, so transparent areas of the source come out white and the files carry no transparency. The sizes are the ones Refract targets; check them against Google's current [Chrome Web Store image guidelines](https://developer.chrome.com/docs/webstore/images) before you publish.
 
 | Asset Type | Dimensions | Usage |
 | :--- | :--- | :--- |
@@ -68,7 +68,7 @@ If you wish to run this offline or modify the code:
 
 1.  **Clone the repository**
     ```bash
-    git clone [https://github.com/jesunahmadushno/Refract.git](https://github.com/jesunahmadushno/Refract.git)
+    git clone https://github.com/jesunahmadushno/Refract.git
     cd Refract
     ```
 

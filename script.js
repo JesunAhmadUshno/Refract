@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsArea = document.getElementById('results-area');
     const gridContainer = document.querySelector('.grid-container');
     const downloadAllBtn = document.getElementById('download-all');
+    const statusText = document.getElementById('status-text');
 
     // Configuration for Chrome Web Store Assets
     const specs = [
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let zipData = new JSZip();
+    let objectUrls = []; // revoked on the next upload so repeated runs do not leak memory
 
     // Interaction Handlers
     browseBtn.addEventListener('click', (e) => {
@@ -23,6 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fileInput.click();
+        }
+    });
 
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -54,7 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Reset UI
         gridContainer.innerHTML = '';
+        objectUrls.forEach(url => URL.revokeObjectURL(url));
+        objectUrls = [];
         zipData = new JSZip();
+        downloadAllBtn.disabled = true;
+        statusText.textContent = 'Processing...';
         dropZone.classList.add('hidden');
         resultsArea.classList.remove('hidden');
 
@@ -67,36 +79,42 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(file);
     }
 
-    function generateAssets(sourceImg) {
-        specs.forEach(spec => {
-            // Create Canvas
+    function renderAsset(sourceImg, spec) {
+        return new Promise((resolve) => {
             const canvas = document.createElement('canvas');
             canvas.width = spec.width;
             canvas.height = spec.height;
             const ctx = canvas.getContext('2d');
 
-            // Draw and resize
-            // We use 'cover' logic (crop to fill) or 'stretch'?
-            // Standard resize usually stretches, but for high quality we often want to maintain aspect ratio.
-            // For this specific tool, we will stretch to exact dimensions to ensure 100% compliance with store rules.
+            // Flatten onto white first so the PNG really has no transparency (README: "no alpha").
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, spec.width, spec.height);
+
+            // Stretch to the exact target size. A source whose aspect ratio differs from the
+            // target is distorted; the dashboard (site/) measures how much for each asset.
             ctx.drawImage(sourceImg, 0, 0, spec.width, spec.height);
 
-            // Convert to Blob
-            canvas.toBlob((blob) => {
-                const fileName = `refract_${spec.name.replace(/\s+/g, '_').toLowerCase()}.png`;
-                
-                // Add to Zip
-                zipData.file(fileName, blob);
-
-                // Create Card in UI
-                const url = URL.createObjectURL(blob);
-                createCard(url, spec.name, `${spec.width}x${spec.height}`, fileName);
-            }, 'image/png');
+            canvas.toBlob((blob) => resolve({ spec, blob }), 'image/png');
         });
     }
 
+    async function generateAssets(sourceImg) {
+        // Wait for every PNG before enabling the ZIP, so an early click can never ship a partial ZIP.
+        const results = await Promise.all(specs.map(spec => renderAsset(sourceImg, spec)));
+        results.forEach(({ spec, blob }) => { // spec order, not toBlob completion order
+            const fileName = `refract_${spec.name.replace(/\s+/g, '_').toLowerCase()}.png`;
+            zipData.file(fileName, blob);
+            const url = URL.createObjectURL(blob);
+            objectUrls.push(url);
+            createCard(url, spec.name, `${spec.width}x${spec.height}`, fileName);
+        });
+        downloadAllBtn.disabled = false;
+        statusText.textContent = 'Processing Complete';
+    }
+
     function createCard(imgUrl, title, dim, fileName) {
-        const card = document.createElement('div');
+        const card = document.createElement('button');
+        card.type = 'button';
         card.className = 'card';
         card.innerHTML = `
             <div class="preview-box">
@@ -107,9 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>${dim} • PNG</p>
             </div>
         `;
-        // Add click to download individual (optional)
-        card.style.cursor = 'pointer';
         card.title = 'Click to download this file';
+        card.setAttribute('aria-label', `Download ${fileName}`);
         card.onclick = () => {
             const a = document.createElement('a');
             a.href = imgUrl;
