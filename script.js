@@ -70,10 +70,17 @@ document.addEventListener('DOMContentLoaded', () => {
         dropZone.classList.add('hidden');
         resultsArea.classList.remove('hidden');
 
+        // A file can claim image/* and still not decode (fake or truncated file, .heic in Chrome).
+        const fail = () => {
+            statusText.textContent = 'Could not read that image. Please choose another file.';
+            dropZone.classList.remove('hidden');
+        };
         const reader = new FileReader();
+        reader.onerror = fail;
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => generateAssets(img);
+            img.onerror = fail;
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);

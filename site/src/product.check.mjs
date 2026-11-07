@@ -16,13 +16,14 @@ assert.match(html, /id="drop-zone"[^>]*role="button"[^>]*tabindex="0"/, 'drop zo
 
 function el(tag = 'div') {
   const handlers = {};
-  return {
-    tag, handlers, children: [], attrs: {}, style: {}, classList: { add() {}, remove() {} }, disabled: false, textContent: '', innerHTML: '',
+  return ({
+    tag, handlers, children: [], attrs: {}, style: {}, classes: new Set(), classList: { add(c) { this.owner.classes.add(c); }, remove(c) { this.owner.classes.delete(c); } }, disabled: false, textContent: '', innerHTML: '',
+    init() { this.classList.owner = this; return this; },
     addEventListener(t, f) { handlers[t] = f; },
     appendChild(c) { this.children.push(c); },
     setAttribute(k, v) { this.attrs[k] = v; },
     click() { this.handlers.click?.({ stopPropagation() {} }); },
-  };
+  }).init();
 }
 const ids = { 'drop-zone': el(), 'file-input': el('input'), 'results-area': el(), 'download-all': el('button'), 'status-text': el('span') };
 const grid = el();
@@ -31,6 +32,8 @@ const calls = [];
 const zipFiles = [];
 const pendingBlobs = [];
 let ready;
+let badImage = false;
+let badRead = false;
 const document = {
   addEventListener: (t, f) => { ready = f; },
   getElementById: (id) => ids[id],
@@ -50,8 +53,9 @@ const ctx = {
   alert: (m) => { throw new Error(`alert: ${m}`); },
   JSZip: class { file(n, b) { zipFiles.push(n); } },
   URL: { createObjectURL: () => `blob:${++urlN}`, revokeObjectURL: (u) => revoked.push(u) },
-  FileReader: class { readAsDataURL() { this.onload({ target: { result: 'data:' } }); } },
-  Image: class { set src(v) { this.onload(); } },
+  // badImage: the file claims image/* but will not decode (fake .png, truncated file, .heic in Chrome)
+  FileReader: class { readAsDataURL() { if (badRead) return this.onerror?.(); this.onload({ target: { result: 'data:' } }); } },
+  Image: class { set src(v) { if (badImage) this.onerror?.(); else this.onload(); } },
 };
 vm.createContext(ctx);
 vm.runInContext(source, ctx);
@@ -84,4 +88,20 @@ for (const s of specs) {
 upload();
 assert.deepEqual(revoked, ['blob:1', 'blob:2', 'blob:3', 'blob:4'], 'previous object URLs revoked on re-upload');
 assert.equal(ids['download-all'].disabled, true, 'ZIP disabled again for the new run');
+
+// an image that fails to decode must not leave the app stuck on 'Processing...'
+pendingBlobs.length = 0;
+badImage = true;
+upload();
+badImage = false;
+assert.equal(pendingBlobs.length, 0, 'nothing rendered for an undecodable image');
+assert.notEqual(ids['status-text'].textContent, 'Processing...', 'undecodable image must not stay on Processing...');
+assert.equal(ids['drop-zone'].classes.has('hidden'), false, 'drop zone shown again after a decode failure');
+ids['status-text'].textContent = '';
+ids['drop-zone'].classes.add('hidden');
+badRead = true;
+upload();
+badRead = false;
+assert.notEqual(ids['status-text'].textContent, 'Processing...', 'unreadable file must not stay on Processing...');
+assert.equal(ids['drop-zone'].classes.has('hidden'), false, 'drop zone shown again after a read failure');
 console.log('product ok', { assets: specs.length, files: zipFiles.slice(0, specs.length) });
