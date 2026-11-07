@@ -1,0 +1,52 @@
+name: Pages
+
+# Publishes the Refract app at the site root and the live dashboard (site/) under /dashboard/.
+# The app needs no build: index.html, script.js and style.css are copied as they are.
+on:
+  push:
+    branches: [main]
+    paths: ['index.html', 'script.js', 'style.css', 'README.md', 'site/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+        working-directory: site
+      # runs the known-answer and product smoke checks, then builds with base /Refract/dashboard/
+      - run: npm run build
+        working-directory: site
+      - name: Assemble app + dashboard
+        run: |
+          mkdir -p _site/dashboard
+          cp index.html script.js style.css .nojekyll _site/
+          cp -r site/dist/. _site/dashboard/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
