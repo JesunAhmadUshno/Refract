@@ -141,7 +141,7 @@ export default function App() {
     setDims({ w: bitmap.width, h: bitmap.height });
   }, []);
   return (
-    <div className="wrap">
+    <div className="wrap"><a className="skip" href="#top">Skip to content</a>
       <MenuBar />
       <div className="glow" aria-hidden="true" />
       <Hero />
@@ -154,14 +154,14 @@ export default function App() {
       <Dock />
       <footer>
         Every size on this page is parsed from <code>script.js</code> at build time. Every image is drawn and measured in your browser; nothing is uploaded anywhere.
-      </footer>
+      <nav className="support" aria-label="Support this work"><a href="https://github.com/sponsors/JesunAhmadUshno">Sponsor this work</a><a href="https://github.com/sponsors/JesunAhmadUshno">Donate</a><a href="https://buymeacoffee.com/jesun">Buy Me a Coffee</a><a href="https://calendly.com/jesunahmadushno/30min">Work with me</a></nav></footer>
     </div>
   );
 }
 
 function Hero() {
   return (
-    <header className="card hero window" id="top" data-title="Refract — README">
+    <header className="card hero window" id="top" data-title="Refract - README">
       <div className="head">
         <p className="eyebrow">Chrome Web Store asset generator · engineering lab</p>
         <span className="pill info">● 100% client-side</span>
@@ -248,7 +248,7 @@ function Generator({ source, label, onFile, upload, onReset }) {
   useEffect(() => { const t = setTimeout(run, 250); return () => clearTimeout(t); }, [run]);
   useEffect(() => () => urls.current.forEach((u) => URL.revokeObjectURL(u)), []);
   return (
-    <section id="generate" className="card window reveal" data-title="refract.app — generator (live)">
+    <section id="generate" className="card window reveal" data-title="refract.app - generator (live)">
       <div className="head">
         <div>
           <p className="eyebrow">Live · same pipeline as script.js</p>
